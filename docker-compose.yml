@@ -1,0 +1,69 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/SmartAPIForge.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Database__Provider: Postgres
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Username=postgres;Password=postgres;Database=smartapiforge"
+      ConnectionStrings__Redis: "redis:6379"
+      Jwt__Key: "REPLACE_WITH_BASE64_256BIT_SECRET"
+      Jwt__Issuer: "SmartAPIForge"
+      Jwt__Audience: "SmartAPIForge.Clients"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: smartapiforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # Uncomment to develop against SQL Server instead of/alongside Postgres.
+  # Set Database__Provider=SqlServer and ConnectionStrings__SqlServer on the
+  # api service to point at it.
+  # mssql:
+  #   image: mcr.microsoft.com/mssql/server:2022-latest
+  #   environment:
+  #     ACCEPT_EULA: "Y"
+  #     MSSQL_SA_PASSWORD: "YOUR_PASSWORD"
+  #   ports:
+  #     - "1433:1433"
+
+  # Uncomment to develop against MySQL instead of/alongside Postgres.
+  # Set Database__Provider=MySql and ConnectionStrings__MySql on the api service.
+  # mysql:
+  #   image: mysql:8
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: "YOUR_PASSWORD"
+  #     MYSQL_DATABASE: smartapiforge
+  #   ports:
+  #     - "3306:3306"
+
+  # Uncomment if/when a feature needs document storage.
+  # mongo:
+  #   image: mongo:7
+  #   ports:
+  #     - "27017:27017"
+
+volumes:
+  postgres-data:
