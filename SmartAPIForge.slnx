@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmartAPIForge.Api/SmartAPIForge.Api.csproj" />
+    <Project Path="src/SmartAPIForge.Application/SmartAPIForge.Application.csproj" />
+    <Project Path="src/SmartAPIForge.Domain/SmartAPIForge.Domain.csproj" />
+    <Project Path="src/SmartAPIForge.Infrastructure/SmartAPIForge.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmartAPIForge.IntegrationTests/SmartAPIForge.IntegrationTests.csproj" />
+    <Project Path="tests/SmartAPIForge.UnitTests/SmartAPIForge.UnitTests.csproj" />
+  </Folder>
+</Solution>
