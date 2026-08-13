@@ -9,5 +9,12 @@ public enum DatabaseProvider
 {
     Postgres,
     SqlServer,
-    MySql
+    MySql,
+
+    /// <summary>
+    /// EF Core's in-memory provider. Only ever selected by the integration
+    /// test host (via the "InMemory" ConnectionStrings entry) — never a
+    /// valid choice for a real deployment.
+    /// </summary>
+    InMemory
 }

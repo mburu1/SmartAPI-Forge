@@ -53,6 +53,7 @@ public static class DependencyInjection
             DatabaseProvider.Postgres => options.UseNpgsql(connectionString),
             DatabaseProvider.SqlServer => options.UseSqlServer(connectionString),
             DatabaseProvider.MySql => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)),
+            DatabaseProvider.InMemory => options.UseInMemoryDatabase(connectionString),
             _ => throw new NotSupportedException($"Database provider '{provider}' is not supported.")
         };
     }
