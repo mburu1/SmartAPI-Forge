@@ -1,0 +1,10 @@
+# Terraform local state, plan output, and provider caches — never commit these.
+# (.terraform.lock.hcl IS committed on purpose — it pins provider versions.)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log

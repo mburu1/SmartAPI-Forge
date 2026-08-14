@@ -84,3 +84,31 @@ jobs:
 
       - name: Build API image
         run: docker build -f src/SmartAPIForge.Api/Dockerfile -t smartapiforge-api:ci .
+
+  terraform-validate:
+    name: Terraform Validate (${{ matrix.stack }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        stack: [aws, azure]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Format check
+        working-directory: deploy/terraform/${{ matrix.stack }}
+        run: terraform fmt -check -diff
+
+      - name: Init (no backend, no cloud credentials needed)
+        working-directory: deploy/terraform/${{ matrix.stack }}
+        run: terraform init -backend=false
+
+      - name: Validate
+        working-directory: deploy/terraform/${{ matrix.stack }}
+        run: terraform validate

@@ -4,11 +4,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
-A production-grade .NET 10 Web API starting point: clean layered
+A production-grade .NET 10 backend scaffolding platform: clean layered
 architecture, JWT authentication with refresh-token rotation on top of
 ASP.NET Core Identity, a database provider you can swap via configuration
 (Postgres, SQL Server, or MySQL), and Scalar for interactive API docs — with
 a full test suite, Docker packaging, and CI wired up from the first commit.
+On top of the API itself: a `dotnet tool` CLI that scaffolds new CRUD
+entities into the same layering, an Angular dashboard for live status, and
+Terraform to stand the whole thing up on AWS or Azure.
 
 ## Problem it solves
 
@@ -112,9 +115,50 @@ later (see [Roadmap](#roadmap)); Redis is already available as an optional
 | `POST /auth/refresh` | — | Exchange a valid refresh token for a new pair (rotates the old one) |
 | `GET /auth/me` | Bearer token | Returns the authenticated user's profile |
 | `GET /health` | — | Liveness check |
+| `GET /system/status` | — | Health + environment + DB provider + uptime + version, for the dashboard |
 
 Full request/response schemas are generated live via `/scalar/v1` (backed by
 .NET's native OpenAPI generator at `/openapi/v1.json`).
+
+## Scaffolding CLI
+
+`SmartAPIForge.CLI` generates a new CRUD slice — Domain entity, Application
+DTOs, and an EF Core-backed Api controller — into a SmartAPI Forge-layout
+project, then wires the entity into `AppDbContext`:
+
+```bash
+dotnet run --project src/SmartAPIForge.CLI -- new entity \
+  --name Product --properties "Name:string,Price:decimal,InStock:bool"
+
+dotnet ef migrations add AddProduct --project src/SmartAPIForge.Infrastructure --startup-project src/SmartAPIForge.Api
+dotnet ef database update --project src/SmartAPIForge.Infrastructure --startup-project src/SmartAPIForge.Api
+```
+
+It's also `dotnet pack`-able as a global tool (`PackAsTool` is set in the
+csproj) — build a `.nupkg` and `dotnet tool install --global --add-source ./nupkg SmartAPIForge.CLI`
+to run it as `smartapiforge` from anywhere.
+
+## Dashboard
+
+`src/SmartAPIForge.Dashboard` is a small Angular app that polls
+`GET /system/status` every 10 seconds and renders it as a KPI row (health,
+environment, DB provider, uptime, version, server time). Run the Api, then:
+
+```bash
+cd src/SmartAPIForge.Dashboard
+npm install
+ng serve
+```
+
+Open `http://localhost:4200` — the Api's CORS policy already allows this
+origin. See that folder's own README for details.
+
+## Deploying to the cloud
+
+`deploy/terraform/aws` and `deploy/terraform/azure` are illustrative
+Terraform stacks — ECS Fargate + RDS + ALB on AWS, Linux App Service +
+Azure Database for PostgreSQL on Azure — validated with `terraform validate`
+but never applied automatically. See [`deploy/terraform/README.md`](deploy/terraform/README.md).
 
 ## Testing
 
@@ -140,10 +184,16 @@ SmartAPI Forge/
 │   ├── SmartAPIForge.Domain/          # Entities, enums — zero dependencies
 │   ├── SmartAPIForge.Application/     # DTOs + service interfaces
 │   ├── SmartAPIForge.Infrastructure/  # EF Core, Identity, JWT, migrations
-│   └── SmartAPIForge.Api/             # Controllers, Program.cs, appsettings
+│   ├── SmartAPIForge.Api/             # Controllers, Program.cs, appsettings
+│   ├── SmartAPIForge.CLI/             # `smartapiforge new entity` scaffolding tool
+│   └── SmartAPIForge.Dashboard/       # Angular status dashboard
 ├── tests/
 │   ├── SmartAPIForge.UnitTests/
 │   └── SmartAPIForge.IntegrationTests/
+├── deploy/
+│   └── terraform/
+│       ├── aws/                       # ECS Fargate + RDS + ALB
+│       └── azure/                     # App Service + Azure Database for PostgreSQL
 ├── docs/
 │   └── architecture.md
 ├── docker-compose.yml
@@ -160,15 +210,15 @@ SmartAPI Forge/
 
 ## Roadmap
 
-The longer-term vision for this project (not yet built, tracked here so the
-intent is visible):
+What's left on the longer-term vision:
 
-- **CLI tool** (`dotnet tool install`) that scaffolds a new API project from
-  a schema/config file, reusing this repo's layering as the template.
-- **Web dashboard** for real-time endpoint observability (request rates,
-  latency, error budgets).
-- **Cloud deploy configurators** — Terraform snippets for AWS RDS / ECS and
-  Azure App Service, generated alongside the existing Dockerfile.
+- **Real endpoint telemetry** — the dashboard currently shows liveness/
+  environment/DB provider; request-rate, latency, and error-budget panels
+  need the Api to emit that data first (e.g. via `Microsoft.Extensions.Diagnostics.Metrics`
+  scraped into a time-series store).
+- **Schema-driven CLI scaffolding** — today `smartapiforge new entity` takes
+  a flat `Name:type` list; scaffolding a full schema/config file (relations,
+  validation rules) is the next step.
 - **MongoDB-backed features** using the `MongoDb` connection string already
   present in configuration.
 

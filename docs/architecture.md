@@ -124,3 +124,22 @@ as an optional `IDistributedCache` backend via
   `AddDbContext` options action runs (before any test hook gets a chance to
   intervene), so overriding the *configuration* Program.cs itself reads is
   the reliable way to redirect it.
+
+## Beyond the API
+
+Three pieces sit outside the layered solution, each documented in its own
+place rather than duplicated here:
+
+- **`SmartAPIForge.CLI`** — a scaffolding tool that generates a new CRUD
+  slice (entity + DTOs + controller) into this layering from a `Name:type`
+  property spec. Deliberately has no project reference to Domain/Application/
+  Infrastructure — it generates source text and edits files on disk, so it
+  works against *any* checkout of this layout, not just this repo's own
+  in-process types. See the root README's "Scaffolding CLI" section.
+- **`SmartAPIForge.Dashboard`** — a standalone Angular app; it only talks to
+  the Api over HTTP (`/system/status`), so it has no build-time coupling to
+  the .NET solution at all.
+- **`deploy/terraform/{aws,azure}`** — infrastructure-as-code for running the
+  Dockerized Api on either cloud. Two independent stacks (not a shared
+  module) since RDS/ECS and Azure App Service have little in common beyond
+  "run this container, give it a Postgres."
