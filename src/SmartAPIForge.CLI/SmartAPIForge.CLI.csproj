@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SmartAPIForge.CLI</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>smartapiforge</ToolCommandName>
+    <PackageId>SmartAPIForge.CLI</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>mburu1</Authors>
+    <Description>Scaffolding CLI for SmartAPI Forge-layout .NET Web API projects. Generates a Domain entity, Application DTOs, and an EF Core-backed CRUD controller from a simple property spec.</Description>
+  </PropertyGroup>
+
+</Project>

@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/SmartAPIForge.Api/SmartAPIForge.Api.csproj" />
     <Project Path="src/SmartAPIForge.Application/SmartAPIForge.Application.csproj" />
+    <Project Path="src/SmartAPIForge.CLI/SmartAPIForge.CLI.csproj" />
     <Project Path="src/SmartAPIForge.Domain/SmartAPIForge.Domain.csproj" />
     <Project Path="src/SmartAPIForge.Infrastructure/SmartAPIForge.Infrastructure.csproj" />
   </Folder>
