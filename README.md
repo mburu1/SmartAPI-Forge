@@ -87,7 +87,8 @@ commit real credentials.
   "SqlServer":  "Server=(localdb)\\MSSQLLocalDB;Database=smartapiforge;Trusted_Connection=True;TrustServerCertificate=True",
   "MySql":      "Server=localhost;Port=3306;Database=smartapiforge;User=root;Password=YOUR_PASSWORD",
   "MongoDb":    "mongodb://localhost:27017/",
-  "Redis":      "localhost:6379"
+  "Redis":      "localhost:6379",
+  "Oracle":     "User Id=YOUR_USER;Password=YOUR_PASSWORD;Data Source=localhost:1521/XEPDB1"
 },
 "Jwt": {
   "Key": "REPLACE_WITH_BASE64_256BIT_SECRET", // openssl rand -base64 32
