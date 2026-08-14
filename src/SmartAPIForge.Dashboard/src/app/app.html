@@ -1,0 +1,70 @@
+<main class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <h1>SmartAPI Forge</h1>
+      <p class="dashboard__subtitle">Live status</p>
+    </div>
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="statusService.refresh()"
+      [disabled]="statusService.loading()"
+    >
+      {{ statusService.loading() ? 'Refreshing…' : 'Refresh' }}
+    </button>
+  </header>
+
+  @if (statusService.error(); as error) {
+    <div class="banner" role="alert">
+      <span class="banner__icon" aria-hidden="true">✕</span>
+      <span>{{ error }} Start the API and refresh.</span>
+    </div>
+  }
+
+  @if (statusService.status(); as status) {
+    <section class="kpi-row" aria-label="System status">
+      <article class="stat-tile" [class]="'stat-tile--' + statusTone(status.status)">
+        <div class="stat-tile__label-row">
+          <span class="stat-tile__icon" aria-hidden="true">{{ statusIcon(status.status) }}</span>
+          <span class="stat-tile__label">Status</span>
+        </div>
+        <span class="stat-tile__value">{{ status.status }}</span>
+      </article>
+
+      <article class="stat-tile">
+        <span class="stat-tile__label">Environment</span>
+        <span class="stat-tile__value">{{ status.environment }}</span>
+      </article>
+
+      <article class="stat-tile">
+        <span class="stat-tile__label">Database provider</span>
+        <span class="stat-tile__value">{{ status.databaseProvider }}</span>
+      </article>
+
+      <article class="stat-tile">
+        <span class="stat-tile__label">Uptime</span>
+        <span class="stat-tile__value">{{ formatUptime(status.uptime) }}</span>
+      </article>
+
+      <article class="stat-tile">
+        <span class="stat-tile__label">Version</span>
+        <span class="stat-tile__value">{{ status.version }}</span>
+      </article>
+
+      <article class="stat-tile">
+        <span class="stat-tile__label">Server time (UTC)</span>
+        <span class="stat-tile__value stat-tile__value--mono">{{ status.serverTimeUtc | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
+      </article>
+    </section>
+  } @else if (!statusService.error()) {
+    <p class="loading">Loading…</p>
+  }
+
+  <footer class="dashboard__footer">
+    <p>
+      Reads <code>/system/status</code> from the Api every 10s. Endpoint
+      request-rate and latency panels land once the Api emits that
+      telemetry (see the project README's roadmap).
+    </p>
+  </footer>
+</main>
