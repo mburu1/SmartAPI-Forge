@@ -10,6 +10,7 @@ env:
   DOTNET_VERSION: "10.0.x"
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NODE_VERSION: "22.x"
 
 jobs:
   build-and-test:
@@ -44,6 +45,33 @@ jobs:
         with:
           name: test-results
           path: TestResults/
+
+  dashboard-build-and-test:
+    name: Dashboard Build & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/SmartAPIForge.Dashboard
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: src/SmartAPIForge.Dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npx ng test --watch=false
+
+      - name: Build
+        run: npx ng build
 
   docker-build:
     name: Docker Build
